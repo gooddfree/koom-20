@@ -1,45 +1,30 @@
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
 
-class TriangleApp(App):
+class CalcLayout(BoxLayout):
+    def press(self, key):
+        display = self.ids.display
+        if key == 'C':
+            display.text = ''
+        elif key == '=':
+            try:
+                # احسب التعبير باستخدام eval بعد تنظيفه
+                expr = display.text
+                # حماية بسيطة: اسمح فقط للأرقام والعمليات الشائعة
+                allowed = "0123456789+-*/(). "
+                if all(ch in allowed for ch in expr):
+                    result = str(eval(expr))
+                else:
+                    result = "ERROR"
+                display.text = result
+            except Exception:
+                display.text = "ERROR"
+        else:
+            display.text += key
+
+class CalcApp(App):
     def build(self):
-        layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
+        return CalcLayout()
 
-        # Title Label
-        title_label = Label(text="حساب مساحة المثلث", font_size='24sp')
-        layout.add_widget(title_label)
-
-        # Base Input
-        self.base_input = TextInput(hint_text="أدخل طول القاعدة", input_type='number', multiline=False)
-        layout.add_widget(self.base_input)
-
-        # Height Input
-        self.height_input = TextInput(hint_text="أدخل الارتفاع", input_type='number', multiline=False)
-        layout.add_widget(self.height_input)
-
-        # Calculate Button
-        calculate_button = Button(text="احسب المساحة")
-        calculate_button.bind(on_press=self.calculate_area)
-        layout.add_widget(calculate_button)
-
-        # Result Label
-        self.result_label = Label(text="", font_size='20sp')
-        layout.add_widget(self.result_label)
-
-        return layout
-
-    def calculate_area(self, instance):
-        try:
-            base = float(self.base_input.text)
-            height = float(self.height_input.text)
-            area = 0.5 * base * height
-            self.result_label.text = f"مساحة المثلث: {area}"
-        except ValueError:
-            self.result_label.text = "الرجاء إدخال أرقام صحيحة!"
-
-
-if __name__ == "__main__":
-    TriangleApp().run()
+if __name__ == '__main__':
+    CalcApp().run()
